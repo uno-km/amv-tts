@@ -112,7 +112,7 @@ def test_termux_tts_load_melo_vulkan_dispatch(tmp_path):
     mock_adapter.return_value.resolve_diagnostic_report.return_value = mock_report
 
     with patch.object(VulkanNeuralEngine, "_find_binary", return_value=str(fake_bin)):
-        with patch("termux_tts.hardware._resolve_ameva_runtime", return_value=MagicMock()):
+        with patch("termux_tts.hardware._resolve_ameva_runtime", return_value=MagicMock()), patch("ameva_device.runtime_guard.installed_runtime_version", return_value="2.8.1"):
             with patch("termux_tts.hardware.bind_tts_hardware", return_value=None):
                 with patch.dict("sys.modules", {"ameva_runtime.adapters": MagicMock(TtsAdapter=mock_adapter)}):
                     eng = termux_tts.load(model=str(tmp_path), engine="melo", device="vulkan")

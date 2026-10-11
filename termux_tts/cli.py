@@ -13,8 +13,24 @@ import argparse
 from pathlib import Path
 import numpy as np
 from .engine import load, doctor
+from termux_tts.exceptions import RuntimeRequiredError
 
 def main():
+    """CLI entry point.
+
+    A GPU request without a usable ameva-runtime ends here with the shared explanation on stderr
+    and exit status 69, whichever sub-command raised it.
+    """
+    from termux_tts.exceptions import RuntimeRequiredError
+    try:
+        return _main_impl()
+    except RuntimeRequiredError as err:
+        sys.stderr.write(str(err))
+        sys.stderr.flush()
+        return 69
+
+
+def _main_impl():
     # Route to default subcommand 'synth' if no recognized subcommand is given
     KNOWN_COMMANDS = {"synth", "speak", "doctor", "install", "profile", "component", "model", "instance"}
     raw_args = sys.argv[1:]
@@ -217,6 +233,8 @@ def main():
                 print(f"[SUCCESS] Speaker profile '{prof.name}' created successfully.")
                 print(f"  Saved path: {saved_path}")
                 print(f"  Duration: {prof.duration_sec:.2f}s | F0 Pitch: {prof.pitch_mean_hz:.1f}Hz | RMS: {prof.energy_rms_db:.1f}dB")
+            except RuntimeRequiredError:
+                raise
             except Exception as e:
                 print(f"[ERROR] Failed to create profile: {e}", file=sys.stderr)
                 sys.exit(1)
@@ -242,6 +260,8 @@ def main():
                 print(f"  - Created At           : {p.created_at}")
                 print(f"  - Extractor Type       : {p.extractor_type}")
                 print(f"  - Source Audio         : {p.source_file or 'N/A'}")
+            except RuntimeRequiredError:
+                raise
             except Exception as e:
                 print(f"[ERROR] {e}", file=sys.stderr)
                 sys.exit(1)
@@ -272,6 +292,8 @@ def main():
                 print(f"  - Target 2 : {p2.name} (Pitch: {p2.pitch_mean_hz:.1f}Hz)")
                 print(f"  - Cosine Similarity: {sim:.4f} (-1.0 to +1.0)")
                 print(f"  - Verdict          : [{verdict}]")
+            except RuntimeRequiredError:
+                raise
             except Exception as e:
                 print(f"[ERROR] Comparison failed: {e}", file=sys.stderr)
                 sys.exit(1)
