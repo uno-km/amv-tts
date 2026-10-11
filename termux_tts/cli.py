@@ -1,3 +1,5 @@
+# Copyright (c) 2026 Uno Kim / AMEVA Foundation. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0 OR Commercial-License
 """
 Command-Line Interface for termux-tts:
 - termux-tts synth : Option A Deep Learning Neural Synthesis to File
@@ -8,11 +10,13 @@ Command-Line Interface for termux-tts:
 import os
 import sys
 import argparse
+from pathlib import Path
+import numpy as np
 from .engine import load, doctor
 
 def main():
     # Route to default subcommand 'synth' if no recognized subcommand is given
-    KNOWN_COMMANDS = {"synth", "speak", "doctor", "install", "component", "model", "instance"}
+    KNOWN_COMMANDS = {"synth", "speak", "doctor", "install", "profile", "component", "model", "instance"}
     raw_args = sys.argv[1:]
     if raw_args and raw_args[0] not in KNOWN_COMMANDS and raw_args[0] not in ("-h", "--help", "-v", "--version"):
         sys.argv.insert(1, "synth")
@@ -54,6 +58,8 @@ def main():
     synth_parser.add_argument("--cluster-vram-budget", type=str, default=None, help="AMEVA cluster VRAM budget")
     synth_parser.add_argument("--ref-audio", type=str, default=None, help="Reference audio file (WAV/MP3) for zero-shot voice cloning")
     synth_parser.add_argument("--ref-text", type=str, default=None, help="Reference audio transcription for high-fidelity cloning")
+    synth_parser.add_argument("--profile", type=str, default=None, help="Registered speaker profile name or path (.vec) for zero-shot personalization")
+    synth_parser.add_argument("--sid", "--speaker-id", dest="speaker_id", type=int, default=None, help="Speaker ID for multi-speaker neural models (e.g. 0, 1, 2...)")
     synth_parser.add_argument("--prompt", type=str, default=None, help="Stylistic or emotional prompt (e.g. 'dramatic documentary narrator')")
 
     # 2. Speak (Option B: Native Samsung/Google System Voice)
@@ -74,6 +80,26 @@ def main():
     )
     install_parser.add_argument("--force", action="store_true", help="Force overwrite existing binary and model assets")
     install_parser.add_argument("--no-play", action="store_true", help="Skip playback verification during self-test")
+
+    # 5. Profile (Personalized Speaker Profile Management)
+    profile_parser = subparsers.add_parser("profile", help="Manage 1-shot voice profiles (~/.termux-tts/profiles/)")
+    prof_subs = profile_parser.add_subparsers(dest="profile_action", help="Profile actions")
+
+    prof_create = prof_subs.add_parser("create", help="Create a 192-dim speaker profile from a 3~7s reference audio")
+    prof_create.add_argument("name", help="Profile identifier name (e.g. 'my_voice')")
+    prof_create.add_argument("-f", "--file", required=True, help="Input reference WAV file")
+
+    prof_subs.add_parser("list", help="List all registered speaker profiles")
+
+    prof_inspect = prof_subs.add_parser("inspect", help="Inspect profile details and acoustic descriptors")
+    prof_inspect.add_argument("name", help="Profile name to inspect")
+
+    prof_del = prof_subs.add_parser("delete", help="Delete a registered speaker profile")
+    prof_del.add_argument("name", help="Profile name to delete")
+
+    prof_cmp = prof_subs.add_parser("compare", help="Compare cosine similarity between two voice profiles or audio files")
+    prof_cmp.add_argument("target1", help="First profile name or WAV file")
+    prof_cmp.add_argument("target2", help="Second profile name or WAV file")
 
     # ── AMEVA Component Protocol v1 ─────────────────────────────────────────
     _protocol_available = False
@@ -101,9 +127,16 @@ def main():
             synth_parser.error("the following arguments are required: text (as positional arguments or -t/--text)")
 
         out_path = os.path.expanduser(args.output) if args.output else None
+        effective_lang = args.lang
+        if effective_lang == "auto":
+            from termux_tts.script_classifier import MultilingualTokenizer
+            detected = list(MultilingualTokenizer.detect_languages(target_text))
+            if len(detected) == 1:
+                effective_lang = detected[0]
+
         with load(
             model=args.model,
-            language=args.lang,
+            language=effective_lang,
             preset=args.preset,
             device=args.device,
             threads=args.threads,
@@ -121,6 +154,10 @@ def main():
                 synth_kwargs["ref_audio"] = args.ref_audio
             if getattr(args, "ref_text", None) is not None:
                 synth_kwargs["ref_text"] = args.ref_text
+            if getattr(args, "profile", None) is not None:
+                synth_kwargs["profile"] = args.profile
+            if getattr(args, "speaker_id", None) is not None:
+                synth_kwargs["speaker_id"] = args.speaker_id
             if getattr(args, "prompt", None) is not None:
                 synth_kwargs["prompt"] = args.prompt
 
@@ -128,7 +165,7 @@ def main():
                 target_text,
                 output=out_path,
                 speed=args.speed,
-                language=args.lang,
+                language=effective_lang,
                 mode=getattr(args, "mode", "unified"),
                 **synth_kwargs
             )
@@ -167,6 +204,79 @@ def main():
             force=args.force,
             play=not args.no_play
         )
+
+    elif args.command == "profile":
+        from .speaker_profile import SpeakerProfile, SpeakerProfileEngine, ProfileNotFoundError
+        prof_engine = SpeakerProfileEngine()
+
+        action = getattr(args, "profile_action", None)
+        if action == "create":
+            try:
+                prof = prof_engine.extract_from_file(args.file, name=args.name)
+                saved_path = prof.save()
+                print(f"[SUCCESS] Speaker profile '{prof.name}' created successfully.")
+                print(f"  Saved path: {saved_path}")
+                print(f"  Duration: {prof.duration_sec:.2f}s | F0 Pitch: {prof.pitch_mean_hz:.1f}Hz | RMS: {prof.energy_rms_db:.1f}dB")
+            except Exception as e:
+                print(f"[ERROR] Failed to create profile: {e}", file=sys.stderr)
+                sys.exit(1)
+
+        elif action == "list":
+            profiles = prof_engine.list_profiles()
+            print(f"Registered Voice Profiles ({len(profiles)}):")
+            print("-" * 75)
+            print(f"{'Name':<20} {'Duration':<10} {'Pitch (Hz)':<12} {'Energy (dB)':<12} {'Created'}")
+            print("-" * 75)
+            for p in profiles:
+                print(f"{p.name:<20} {p.duration_sec:>6.2f}s    {p.pitch_mean_hz:>8.1f}Hz   {p.energy_rms_db:>8.1f}dB   {p.created_at}")
+            print("-" * 75)
+
+        elif action == "inspect":
+            try:
+                p = prof_engine.get_profile(args.name)
+                print(f"Profile: {p.name}")
+                print(f"  - Embedding Dimensions : {len(p.embedding)} (L2 Norm: {np.linalg.norm(p.embedding):.4f})")
+                print(f"  - Duration             : {p.duration_sec:.2f}s")
+                print(f"  - Pitch Mean           : {p.pitch_mean_hz:.1f} Hz")
+                print(f"  - Energy RMS           : {p.energy_rms_db:.1f} dB")
+                print(f"  - Created At           : {p.created_at}")
+                print(f"  - Extractor Type       : {p.extractor_type}")
+                print(f"  - Source Audio         : {p.source_file or 'N/A'}")
+            except Exception as e:
+                print(f"[ERROR] {e}", file=sys.stderr)
+                sys.exit(1)
+
+        elif action == "delete":
+            target = prof_engine.profiles_dir / f"{args.name}.vec"
+            target_meta = prof_engine.profiles_dir / f"{args.name}.meta.json"
+            if not target.is_file():
+                print(f"[ERROR] Profile '{args.name}' not found at {target}", file=sys.stderr)
+                sys.exit(1)
+            target.unlink(missing_ok=True)
+            target_meta.unlink(missing_ok=True)
+            print(f"[SUCCESS] Deleted profile '{args.name}'.")
+
+        elif action == "compare":
+            try:
+                def _get_or_load(target_str: str) -> SpeakerProfile:
+                    if Path(target_str).is_file():
+                        return prof_engine.extract_from_file(target_str)
+                    return prof_engine.get_profile(target_str)
+
+                p1 = _get_or_load(args.target1)
+                p2 = _get_or_load(args.target2)
+                sim = SpeakerProfileEngine.compute_similarity(p1, p2)
+                verdict = "MATCH (Same Speaker)" if sim >= 0.80 else ("BORDERLINE" if sim >= 0.65 else "DIFFERENT")
+                print(f"Speaker Verification Similarity Analysis:")
+                print(f"  - Target 1 : {p1.name} (Pitch: {p1.pitch_mean_hz:.1f}Hz)")
+                print(f"  - Target 2 : {p2.name} (Pitch: {p2.pitch_mean_hz:.1f}Hz)")
+                print(f"  - Cosine Similarity: {sim:.4f} (-1.0 to +1.0)")
+                print(f"  - Verdict          : [{verdict}]")
+            except Exception as e:
+                print(f"[ERROR] Comparison failed: {e}", file=sys.stderr)
+                sys.exit(1)
+        else:
+            profile_parser.print_help()
 
     elif args.command in ("component", "model", "instance") and _protocol_available:
         from ameva_component.cli_support import dispatch_protocol

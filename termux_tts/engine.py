@@ -1,3 +1,5 @@
+# Copyright (c) 2026 Uno Kim / AMEVA Foundation. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0 OR Commercial-License
 """
 Unified 4-Tier Multi-Backend TTS Gateway for termux-tts:
 - Tier 1: Pure Parametric DSP Formant Synthesizer Engine (ParametricDSPEngine - 0MB Zero-Dependency)
@@ -278,6 +280,8 @@ class TTSEngine:
         output_path: Optional[str] = None,
         ref_audio: Optional[Union[str, os.PathLike]] = None,
         ref_text: Optional[str] = None,
+        profile: Optional[Union[str, os.PathLike]] = None,
+        speaker_id: Optional[int] = None,
         prompt: Optional[str] = None,
     ) -> Union[SherpaResult, ExpressiveResult, NativeResult, MultilingualResult, SOTAResult]:
         """Synthesize text into speech audio buffer / WAV file with Zero-Config intelligent routing."""
@@ -291,6 +295,19 @@ class TTSEngine:
 
         from .script_classifier import normalize_language_code
         target_lang = normalize_language_code(language or self.language)
+
+        # Resolve speaker profile if provided via --profile or --ref-audio
+        resolved_profile = None
+        if profile is not None or ref_audio is not None:
+            try:
+                from .speaker_profile import SpeakerProfileEngine
+                prof_engine = SpeakerProfileEngine()
+                if profile is not None:
+                    resolved_profile = prof_engine.get_profile(str(profile))
+                elif ref_audio is not None:
+                    resolved_profile = prof_engine.extract_from_file(ref_audio)
+            except Exception as e:
+                logger.warning(f"Could not load/extract speaker profile: {e}")
 
         # 1. If user explicitly pinned to OS Native voice, speak directly
         if self.requested_engine_type == "native":
@@ -318,6 +335,8 @@ class TTSEngine:
             kwargs = {}
             if target_lang != "auto":
                 kwargs["language"] = target_lang
+            if resolved_profile is not None:
+                kwargs["speaker_profile"] = resolved_profile
             return multi_engine.synthesize(
                 clean_text,
                 output=output,
@@ -339,6 +358,12 @@ class TTSEngine:
                 kwargs["ref_text"] = ref_text
             if "prompt" in sig.parameters and prompt is not None:
                 kwargs["prompt"] = prompt
+            if "speaker_id" in sig.parameters and speaker_id is not None:
+                kwargs["speaker_id"] = speaker_id
+            if "speaker_profile" in sig.parameters and resolved_profile is not None:
+                kwargs["speaker_profile"] = resolved_profile
+            elif "profile" in sig.parameters and resolved_profile is not None:
+                kwargs["profile"] = resolved_profile
             return self.synth_engine.synthesize(clean_text, output=output, speed=speed, **kwargs)
         elif hasattr(self.synth_engine, "speak"):
             return self.synth_engine.speak(clean_text)

@@ -1,3 +1,5 @@
+# Copyright (c) 2026 Uno Kim / AMEVA Foundation. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0 OR Commercial-License
 """
 Sherpa-ONNX C++ Native Subprocess Inference Engine for termux-tts (Tier 3-Neural & Tier 4-Expressive).
 Directly executes high-performance C++ sherpa-onnx binaries for VITS, Kokoro, and Matcha models
@@ -13,7 +15,7 @@ import tempfile
 import time
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Optional, List, Dict, Any
+from typing import Optional, List, Dict, Any, Union
 
 from .audio import AudioBuffer
 from .exceptions import TTSModelLoadError, TTSInferenceError
@@ -296,6 +298,9 @@ class SherpaNeuralEngine:
         output: Optional[str] = None,
         speed: float = 1.0,
         preset: Optional[str] = None,
+        speaker_id: Optional[int] = None,
+        speaker_profile: Optional[Union[Any, str]] = None,
+        profile: Optional[Union[Any, str]] = None,
     ) -> SherpaResult:
         """Synthesize natural speech audio from text using C++ isolated subprocess."""
         if self._is_closed:
@@ -353,8 +358,10 @@ class SherpaNeuralEngine:
                     f"--output-filename={temp_wav}",
                     f"--num-threads={self.threads}",
                     f"--speed={speed:.2f}",
-                    normalized_text,
                 ]
+                if speaker_id is not None:
+                    cmd.append(f"--sid={speaker_id}")
+                cmd.append(normalized_text)
             else:
                 cmd = [
                     self.binary,
@@ -368,6 +375,8 @@ class SherpaNeuralEngine:
                     cmd.append(f"--vits-data-dir={self.model_assets['data_dir']}")
                 elif self.model_assets.get("lexicon"):
                     cmd.append(f"--vits-lexicon={self.model_assets['lexicon']}")
+                if speaker_id is not None:
+                    cmd.append(f"--sid={speaker_id}")
                 cmd.append(normalized_text)
 
             # Cluster Distributed Inference Routing & Pre-Flight Verification
@@ -413,8 +422,15 @@ class SherpaNeuralEngine:
                     f"[FAIL-FAST] sherpa-onnx exited with 0 but generated no audio file or empty file: {res.stderr.strip()}"
                 )
 
-            # Load raw WAV and apply DAC ramp-up silence padding (200ms lead-in, 150ms lead-out)
+            # Load raw WAV and apply acoustic voice adaptation if speaker profile is provided
             raw_buf = AudioBuffer.from_wav_file(temp_wav)
+            resolved_prof = speaker_profile or profile
+            if resolved_prof is not None:
+                from .acoustic_adaptor import adapt_waveform_to_profile
+                adapted_samples = adapt_waveform_to_profile(raw_buf.samples, raw_buf.sample_rate, resolved_prof)
+                raw_buf = AudioBuffer(adapted_samples, sample_rate=raw_buf.sample_rate)
+
+            # Apply DAC ramp-up silence padding (200ms lead-in, 150ms lead-out)
             padded_buf = raw_buf.pad_silence(lead_in_ms=200, lead_out_ms=150)
 
             elapsed_ms = (time.perf_counter() - t0) * 1000.0

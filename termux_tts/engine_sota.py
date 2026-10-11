@@ -1,3 +1,5 @@
+# Copyright (c) 2026 Uno Kim / AMEVA Foundation. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0 OR Commercial-License
 """
 SOTA Neural Speech & Zero-shot Voice Cloning Multi-Backend Gateway for termux-tts:
 - CosyVoice 2 (Alibaba): 0.5B Audio LLM + DiT Flow Matching (Natural Breaths, Salivation, 3s Zero-shot, Multilingual)
@@ -103,8 +105,8 @@ class SOTANeuralEngine:
         sample_rate: Optional[int] = None,
         rpc: Optional[str] = None,
     ):
-        self.raw_backend = str(backend).lower()
-        self.backend = self._resolve_backend_enum(self.raw_backend)
+        self.raw_backend = backend.value if hasattr(backend, "value") else str(backend).lower()
+        self.backend = self._resolve_backend_enum(backend)
         self.model_path = model_path
         self.language = language.lower()
         self.device = device.lower()
@@ -131,16 +133,18 @@ class SOTANeuralEngine:
         if not self.rpc:
             self._init_local_backend()
 
-    def _resolve_backend_enum(self, b_str: str) -> SOTABackend:
-        b = b_str.strip().lower()
-        if b in ("cosyvoice", "cosyvoice2", "cosy"):
+    def _resolve_backend_enum(self, b_val: Union[str, SOTABackend]) -> SOTABackend:
+        if isinstance(b_val, SOTABackend):
+            return b_val
+        b_str = str(b_val.value if hasattr(b_val, "value") else b_val).strip().lower()
+        if any(k in b_str for k in ("cosyvoice", "cosyvoice2", "cosy")):
             return SOTABackend.COSYVOICE2
-        elif b in ("f5tts", "f5", "f5_tts", "e2", "e2tts"):
+        elif any(k in b_str for k in ("f5tts", "f5", "f5_tts", "e2", "e2tts")):
             return SOTABackend.F5_TTS
-        elif b in ("chattts", "chat", "chat_tts"):
+        elif any(k in b_str for k in ("chattts", "chat", "chat_tts")):
             return SOTABackend.CHATTTS
         raise TTSConfigurationError(
-            f"Unsupported SOTA TTS backend: '{b_str}'. Supported options: 'cosyvoice2', 'f5tts', 'chattts'."
+            f"Unsupported SOTA TTS backend: '{b_val}'. Supported options: 'cosyvoice2', 'f5tts', 'chattts'."
         )
 
     def _init_local_backend(self) -> None:
