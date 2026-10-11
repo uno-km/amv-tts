@@ -1,3 +1,5 @@
+# Copyright (c) 2026 Uno Kim / AMEVA Foundation. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0 OR Commercial-License
 """
 Enterprise Extensible Multilingual Neural Speech Synthesis Orchestrator for termux-tts.
 Orchestrates multi-script tokenization, memory-resident neural acoustic inference via Sherpa C-API

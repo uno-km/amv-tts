@@ -1,3 +1,5 @@
+# Copyright (c) 2026 Uno Kim / AMEVA Foundation. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0 OR Commercial-License
 """
 Android OS System Native TTS Engine Bridge (Option B).
 Directly communicates with Samsung / Google Voice Engine via Termux IPC.

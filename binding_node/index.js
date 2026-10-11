@@ -1,4 +1,8 @@
 /**
+ * Copyright (c) 2026 Uno Kim / AMEVA Foundation. All rights reserved.
+ * SPDX-License-Identifier: Apache-2.0 OR Commercial-License
+ */
+/**
  * termux-tts Node.js SDK
  * Secure On-Device Speech Synthesis Binding (CWE-94 Remediation).
  */

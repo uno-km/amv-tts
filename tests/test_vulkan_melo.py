@@ -1,3 +1,5 @@
+# Copyright (c) 2026 Uno Kim / AMEVA Foundation. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0 OR Commercial-License
 """
 Unit and integration tests for MeloTTS Vulkan acceleration (Plan 1 NCNN Sliced & Plan 2 MNN Vulkan).
 Tests adhere strictly to AOSF-ENG-STD-2026 and Zero-Silent-Fallback [AMEVA-TTS-E001].

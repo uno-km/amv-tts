@@ -1,3 +1,5 @@
+# Copyright (c) 2026 Uno Kim / AMEVA Foundation. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0 OR Commercial-License
 """
 MeloTTS Tokenizer and Phonetic Normalizer for termux-tts.
 Maps input text to MeloTTS model input tensors:

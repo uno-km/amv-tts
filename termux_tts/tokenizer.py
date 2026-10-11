@@ -1,3 +1,5 @@
+# Copyright (c) 2026 Uno Kim / AMEVA Foundation. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0 OR Commercial-License
 """
 Grapheme-to-Phoneme (G2P) Phonetic Tokenizer for Korean and English.
 Includes Number-to-Speech Normalizer and Inline Expressive Tag Parser.

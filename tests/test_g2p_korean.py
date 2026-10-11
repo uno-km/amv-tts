@@ -1,3 +1,5 @@
+# Copyright (c) 2026 Uno Kim / AMEVA Foundation. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0 OR Commercial-License
 """
 Unit and Granular Test Suite for Korean Grapheme-to-Phoneme (G2P) Engine.
 Validates adherence to National Institute of Korean Language Standard Pronunciation Rules.

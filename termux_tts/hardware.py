@@ -1,3 +1,5 @@
+# Copyright (c) 2026 Uno Kim / AMEVA Foundation. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0 OR Commercial-License
 """
 Hardware abstraction gateway and dynamic ameva-runtime soft-dependency resolver for termux-tts.
 Provides strict Zero-Silent-Fallback [AMEVA-TTS-E001] compliance, hardware-agnostic routing,

@@ -1,4 +1,6 @@
 #!/bin/bash
+# Copyright (c) 2026 Uno Kim / AMEVA Foundation. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0 OR Commercial-License
 # ==============================================================================
 # termux-tts: Zero-Drift One-Touch Unified Installer (Android Termux / Linux)
 # Open-Source under Apache License 2.0 (AMEVA Foundation)

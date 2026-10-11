@@ -1,3 +1,5 @@
+# Copyright (c) 2026 Uno Kim / AMEVA Foundation. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0 OR Commercial-License
 """
 termux_tts.control.instances
 InstanceRegistry 연동 — DSP / ONNX / Native 엔진을 각각 Instance로 표현.

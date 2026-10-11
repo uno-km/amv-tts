@@ -1,3 +1,5 @@
+# Copyright (c) 2026 Uno Kim / AMEVA Foundation. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0 OR Commercial-License
 """
 termux-tts: Production-Grade 4-Tier TTS Framework for Android Termux.
 - Tier 1: Parametric DSP Formant Synthesizer Engine (0MB Zero-Dependency)

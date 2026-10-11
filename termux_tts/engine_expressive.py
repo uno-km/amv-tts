@@ -1,3 +1,5 @@
+# Copyright (c) 2026 Uno Kim / AMEVA Foundation. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0 OR Commercial-License
 """
 Expressive Conversational TTS Engine for termux-tts (Tier 4-Expressive).
 Enables authentic on-device conversational prosody with emotional tags:

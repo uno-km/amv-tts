@@ -1,3 +1,5 @@
+# Copyright (c) 2026 Uno Kim / AMEVA Foundation. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0 OR Commercial-License
 """
 Unit test suite for Tier 5 SOTA Neural Voice Cloning & Expressive Flow Synthesizers:
 - CosyVoice 2 (0.5B Audio LLM + DiT Flow Matching)

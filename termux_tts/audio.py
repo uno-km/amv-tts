@@ -1,3 +1,5 @@
+# Copyright (c) 2026 Uno Kim / AMEVA Foundation. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0 OR Commercial-License
 """
 Zero-Dependency Audio Buffer and RIFF WAV Stream Encoder.
 Handles 16-bit Linear PCM formatting with soft-clipping protection.

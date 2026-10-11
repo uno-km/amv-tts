@@ -1,3 +1,5 @@
+# Copyright (c) 2026 Uno Kim / AMEVA Foundation. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0 OR Commercial-License
 """
 Strict Dual Routing & Zero-Fallback Fail-Fast Verification for termux-tts.
 Tests:

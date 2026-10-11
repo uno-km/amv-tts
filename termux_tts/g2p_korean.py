@@ -1,3 +1,5 @@
+# Copyright (c) 2026 Uno Kim / AMEVA Foundation. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0 OR Commercial-License
 """
 Production-Grade Korean Grapheme-to-Phoneme (G2P) Engine for termux-tts.
 Strict adherence to National Institute of Korean Language (국립국어원) Standard Pronunciation Rules.

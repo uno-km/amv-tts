@@ -1,3 +1,5 @@
+# Copyright (c) 2026 Uno Kim / AMEVA Foundation. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0 OR Commercial-License
 """
 Expressive Presets & Non-Verbal Acoustic Tokens Audit Suite for termux-tts.
 Tests Fast, Balanced, Expressive, Ultra presets and [laugh], [sigh], [breath], [clears_throat] tags.

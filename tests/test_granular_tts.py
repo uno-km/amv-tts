@@ -1,3 +1,5 @@
+# Copyright (c) 2026 Uno Kim / AMEVA Foundation. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0 OR Commercial-License
 """
 Production-Grade Invariant & Acoustic Safety Test Suite for termux-tts.
 Validates G2P correctness, Number Normalization, Acoustic Signal Energy, Filter Stability, and Security Bounds.

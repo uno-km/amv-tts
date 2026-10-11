@@ -1,3 +1,5 @@
+# Copyright (c) 2026 Uno Kim / AMEVA Foundation. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0 OR Commercial-License
 """
 termux_tts.control.models
 ModelRegistry 연동 — TTS 모델 + Voice 분리 관리.

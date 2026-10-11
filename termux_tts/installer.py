@@ -1,3 +1,5 @@
+# Copyright (c) 2026 Uno Kim / AMEVA Foundation. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0 OR Commercial-License
 """
 Automated One-Click Native Installer & Model Provisioner for termux-tts.
 Downloads pre-compiled ARM64 native Sherpa-ONNX CPU engine binaries and studio neural speech models.
