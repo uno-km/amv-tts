@@ -1,3 +1,16 @@
+# v1.7.0 (2026-10-13) — Tier 5 SOTA Neural Pipelines & Zero-Shot Voice Cloning
+
+Integrated Tier 5 SOTA neural speech synthesis pipelines (CosyVoice 2, F5-TTS, ChatTTS INT8 ONNX) with zero-shot voice cloning, purged legacy sinusoidal stubs for strict fail-fast execution, and added acoustic adaptor CLI.
+
+### Key Changes
+- Integrated Tier 5 SOTA ONNX neural synthesis pipelines: CosyVoice 2, F5-TTS, and ChatTTS INT8.
+- Enabled on-device zero-shot voice cloning and conversational prosody control.
+- Eliminated legacy sinusoidal fallback stubs in favor of strict fail-fast error reporting.
+- Added speaker profile and acoustic adaptor CLI commands.
+- Unified GPU neural vocoder dispatch through ameva-runtime HAL.
+
+---
+
 # Release Notes - termux-tts v1.5.5
 
 **Release Tag**: `v1.5.5`  
