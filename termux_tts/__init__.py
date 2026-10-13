@@ -8,7 +8,7 @@ termux-tts: Production-Grade 4-Tier TTS Framework for Android Termux.
 - Tier 4: Pure On-Device Expressive Emotional Synthesizer (Conversational Tags)
 """
 
-__version__ = "1.6.0"
+__version__ = "1.7.0"
 
 from .engine import TTSEngine, load, doctor, QUALITY_PRESETS
 from .engine_native import NativeAndroidEngine, NativeResult
@@ -48,7 +48,7 @@ from .downloader import list_models, download_model, resolve_model_path
 ONNXNeuralEngine = SherpaNeuralEngine
 ONNXResult = SherpaResult
 
-__version__ = "1.5.6"
+__version__ = "1.7.0"
 __all__ = [
     "TTSEngine",
     "load",
