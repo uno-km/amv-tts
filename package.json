@@ -1,5 +1,5 @@
 {
-  "name": "termux-tts",
+  "name": "amv-tts",
   "version": "1.7.0",
   "description": "On-device Text-to-Speech framework utilizing device resources (DSP Formant Vocoder, ONNX Neural Runtime & Android Native Voice)",
   "main": "index.js",

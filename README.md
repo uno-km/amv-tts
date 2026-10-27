@@ -1,9 +1,13 @@
-# Termux-TTS
+# AMV-TTS
 
-[![PyPI](https://img.shields.io/pypi/v/termux-tts.svg?style=flat-square&color=0369a1)](https://pypi.org/project/termux-tts/)
-[![Python](https://img.shields.io/pypi/pyversions/termux-tts.svg?style=flat-square)](https://pypi.org/project/termux-tts/)
-[![npm](https://img.shields.io/npm/v/termux-tts.svg?style=flat-square&color=b91c1c)](https://www.npmjs.com/package/termux-tts)
-[![License](https://img.shields.io/badge/License-Apache_2.0-004499.svg?style=flat-square)](https://github.com/uno-km/termux-tts)
+> **마이그레이션 안내**: 이 패키지는 `termux-tts`에서 `amv-tts`로 이름이 바뀌었습니다. 기존 `termux-tts` 배포본(PyPI/npm)은 호환을 위해 당분간 유지되나 deprecated 상태이며 더 이상 갱신되지 않습니다. `pip install amv-tts` / `npm install amv-tts`로 전환하십시오.
+>
+> Android **Termux 환경** 또는 **안드로이드 Linux 커널(루팅 없이 Linux 환경이 구동되는 모든 디바이스)** 에서 동작합니다 — Termux 전용이 아닙니다.
+
+[![PyPI](https://img.shields.io/pypi/v/amv-tts.svg?style=flat-square&color=0369a1)](https://pypi.org/project/amv-tts/)
+[![Python](https://img.shields.io/pypi/pyversions/amv-tts.svg?style=flat-square)](https://pypi.org/project/amv-tts/)
+[![npm](https://img.shields.io/npm/v/amv-tts.svg?style=flat-square&color=b91c1c)](https://www.npmjs.com/package/amv-tts)
+[![License](https://img.shields.io/badge/License-Apache_2.0-004499.svg?style=flat-square)](https://github.com/uno-km/amv-tts)
 
 > Production-Grade 4-Tier On-Device Speech Synthesis Framework (Multilingual Neural Orchestrator, Zero-Dependency DSP Formant & C++ Acceleration)
 
@@ -51,27 +55,27 @@ Measurements gathered on physical Android 16 hardware running Termux ARM64:
 ### 1. Package Installation
 ```bash
 # Python SDK & CLI
-pip install termux-tts
+pip install amv-tts
 
 # Node.js / TypeScript
-npm install termux-tts
+npm install amv-tts
 ```
 
 ### 2. Automated Model Provisioning
 Automate downloading and linking precompiled models to the official immutable path (`/data/data/com.termux/files/home/models/tts/`):
 ```bash
 # Default lightweight installation (Korean KSS + English Lessac)
-termux-tts install
+amv-tts install
 
 # On-demand provision specific language models:
-termux-tts install --models hi    # Hindi (Piper Swara)
-termux-tts install --models ja    # Japanese (Piper Hina)
-termux-tts install --models ru    # Russian (Piper Dmitri)
-termux-tts install --models zh    # Chinese (AISHELL3)
-termux-tts install --models all   # All 9 official languages
+amv-tts install --models hi    # Hindi (Piper Swara)
+amv-tts install --models ja    # Japanese (Piper Hina)
+amv-tts install --models ru    # Russian (Piper Dmitri)
+amv-tts install --models zh    # Chinese (AISHELL3)
+amv-tts install --models all   # All 9 official languages
 
 # Provision Studio Vulkan GPU engine:
-termux-tts install --tier high
+amv-tts install --tier high
 ```
 
 ---
@@ -81,23 +85,23 @@ termux-tts install --tier high
 ### Global Command-Line Interface (Zero-Config)
 ```bash
 # 1. Zero-config synthesis with physical speaker playback
-termux-tts "Hello 방가방가 나는 parrot 이라고 해." -o ~/out.wav --play
+amv-tts "Hello 방가방가 나는 parrot 이라고 해." -o ~/out.wav --play
 
 # 2. Flag-based syntax
-termux-tts -t "Multilingual neural speech synthesis on device." --play
+amv-tts -t "Multilingual neural speech synthesis on device." --play
 
 # 3. Force language pinning
-termux-tts -l en -t "Pure English text output." --play
-termux-tts -l ko -t "한국어 단독 신경망 음성 합성." --play
+amv-tts -l en -t "Pure English text output." --play
+amv-tts -l ko -t "한국어 단독 신경망 음성 합성." --play
 
 # 4. Instant DSP Formant synthesis (0MB footprint)
-termux-tts synth -e dsp -t "Zero dependency DSP synthesis." -o dsp.wav
+amv-tts synth -e dsp -t "Zero dependency DSP synthesis." -o dsp.wav
 
 # 5. Direct Android system native speaker broadcast
-termux-tts speak -t "Hardware speaker broadcast via Android service."
+amv-tts speak -t "Hardware speaker broadcast via Android service."
 
 # 6. Hardware diagnostics
-termux-tts doctor
+amv-tts doctor
 ```
 
 ### Python SDK
@@ -125,7 +129,7 @@ with tts.load(engine="dsp", preset="balanced") as engine:
 
 ### Node.js / TypeScript
 ```typescript
-import * as tts from 'termux-tts';
+import * as tts from 'amv-tts';
 
 async function main() {
   const engine = tts.load({ engine: 'vulkan', tier: 'high' });
