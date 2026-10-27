@@ -68,10 +68,10 @@ neural = ["onnxruntime>=1.15.0"]
 dev = ["pytest>=7.0", "paramiko>=3.0"]
 
 [project.scripts]
-termux-tts = "termux_tts.cli:main"
+amv-tts = "termux_tts.cli:main"
 
 [project.entry-points."ameva.components"]
-termux-tts = "termux_tts.adapter:create_adapter"
+amv-tts = "termux_tts.adapter:create_adapter"
 
 [tool.setuptools.packages.find]
 where = ["."]
